@@ -1,0 +1,97 @@
+i pkginfo=./pkginfo
+i postremove=./postremove
+i preremove=./preremove
+i postinstall=./postinstall
+d none /etc 0755 root sys
+s none /etc/COSas=../opt/COSas/etc/
+d none etc 0750 bin bin
+d none bin 0755 bin bin
+d none smf-manifest 0755 bin bin
+f none bin/agent-freespace-lfs.sh 0755 bin bin
+f none bin/agent-freespace.sh 0755 bin bin
+f none bin/agent-ftp.sh 0755 bin bin
+f none bin/agent-ssh.sh 0755 bin bin
+f none bin/agent-mail-smtp.sh 0755 bin bin
+s none bin/agent-mail.sh=agent-mail-smtp.sh
+f none bin/agent-mail-pop3.sh 0755 bin bin
+f none bin/agent-mountpt.sh 0755 bin bin
+f none bin/agent-tcpip-grep.sh 0755 bin bin
+f none bin/agent-tcpip-perl.sh 0755 bin bin
+f none bin/agent-tcpip.sh 0755 bin bin
+f none bin/agent-web.sh 0755 bin bin
+s none bin/agent-web-portal.sh=agent-web.sh
+f none bin/agent-web-portalOra.sh 0755 bin bin
+s none bin/agent-web-genericparser.sh=agent-web-portalOra.sh
+s none bin/agent-web-amloginHost.sh=agent-web-portalOra.sh
+s none bin/agent-web-amlogin.sh=agent-web-amloginHost.sh
+s none bin/agent-web-openssologinHost.sh=agent-web-portalOra.sh
+s none bin/agent-web-openssologin.sh=agent-web-openssologinHost.sh
+f none bin/diag-runtime.sh 0755 bin bin
+f none bin/clean-dump.sh 0755 bin bin
+f none bin/clean-zfs-snaps.sh 0755 bin bin
+f none bin/clonedir.sh 0755 bin bin
+f none bin/check-psam.sh 0755 bin bin
+f none bin/check-portal-local.sh 0755 bin bin
+s none bin/check-amserver-login.sh=check-portal-local.sh
+s none bin/check-magnolia.sh=check-portal-local.sh
+f none bin/dumper-mysql-export.sh 0755 bin bin
+f none bin/dumper-mysql-export-multiple.sh 0700 root bin
+f none bin/dumper-pgsql-export.sh 0755 bin bin
+f none bin/dumper-pgsql-export-multiple.sh 0700 root bin
+f none bin/dumper-generic.sh 0755 bin bin
+f none bin/dumper-oracle-export.sh 0755 bin bin
+f none bin/dumper-oracle-export-actual.sh 0700 root bin
+f none bin/dumper-oracle-export-multiple.sh 0700 root bin
+f none bin/dumper-sundsee6.sh 0755 bin bin
+s none bin/dumper-sundsee6-ldif.sh=dumper-sundsee6.sh
+s none bin/dumper-sundsee6-ads.sh=dumper-sundsee6.sh
+s none bin/dumper-sundsee6-ads-ldif.sh=dumper-sundsee6-ldif.sh
+s none bin/dumper-sundsee6-dps1.sh=dumper-sundsee6.sh
+s none bin/dumper-sundsee7-agent.sh=dumper-sundsee6.sh
+s none bin/dumper-sundsee7.sh=dumper-sundsee6.sh
+s none bin/dumper-sundsee7-ldif.sh=dumper-sundsee6-ldif.sh
+f none bin/dumper-sunics5-archive.sh 0755 bin bin
+f none bin/dumper-sunics5-hotbackup.sh 0755 bin bin
+f none bin/dumper-sunmsg.sh 0755 bin bin
+s none bin/dumper-sunisw.sh=dumper-generic.sh
+s none bin/dumper-sunmsg-config.sh=dumper-generic.sh
+s none bin/dumper-oucs-config.sh=dumper-generic.sh
+s none bin/dumper-sws7-config.sh=dumper-generic.sh
+s none bin/dumper-clamav.sh=dumper-generic.sh
+s none bin/dumper-sendmailcfg.sh=dumper-generic.sh
+s none bin/dumper-alfresco.sh=dumper-generic.sh
+s none bin/dumper-magnolia.sh=dumper-generic.sh
+s none bin/dumper-mfc.sh=dumper-generic.sh
+s none bin/dumper-named.sh=dumper-generic.sh
+s none bin/dumper-syscfg-sol.sh=dumper-generic.sh
+s none bin/dumper-syscfg-lin.sh=dumper-generic.sh
+s none bin/dumper-syscfg.sh=dumper-generic.sh
+s none bin/dumper-mio-all.sh=dumper-generic.sh
+s none bin/dumper-portal-all.sh=dumper-generic.sh
+s none bin/dumper-portal-all-7.sh=dumper-generic.sh
+s none bin/dumper-portal-config.sh=dumper-generic.sh
+s none bin/dumper-portal-content.sh=dumper-generic.sh
+s none bin/dumper-portal-mps.sh=dumper-generic.sh
+f none bin/findcores.sh 0755 bin bin
+f none bin/logkeep-portal.sh 0755 bin bin
+f none bin/logkeep-sendmail.sh 0755 bin bin
+s none bin/logkeep-mail.sh=logkeep-sendmail.sh
+f none bin/logkeep-weblb.sh 0755 bin bin
+f none bin/ldifsort.pl 0755 bin bin
+f none bin/ldifsort-fulltree.pl 0755 bin bin
+f none bin/proctree.sh 0755 bin bin
+f none bin/pkgdep.sh 0755 bin bin
+f none bin/runlevel_check.include 0644 bin bin
+f none bin/sjsms-sunnumusers.sh 0755 bin bin
+f none bin/timerun.sh 0755 bin bin
+f none bin/test-archive.sh 0755 bin bin
+f none bin/compressor_choice.include 0644 bin bin 
+f none bin/compressor_list.include 0644 bin bin
+f none bin/zfsacl-copy.sh 0755 bin bin
+f none bin/zpool-scrub.sh 0755 bin bin
+f none bin/rsync-backups.sh 0755 bin bin
+f none bin/rsync-loop.sh 0755 bin bin
+f none bin/rsync-loop-init.sh 0755 bin bin
+f none bin/rsync-zfshot.sh 0755 bin bin
+f none bin/rsync-backup-toZFSsnapshots.sh 0755 bin bin
+f none smf-manifest/rsync-loop.xml 0644 bin bin

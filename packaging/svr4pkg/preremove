@@ -1,0 +1,8 @@
+#! /bin/sh
+
+# Preremove script for COSac packages
+# $Id: preremove,v 1.1 2006/06/06 07:36:12 jim Exp $
+
+PATH="/usr/bin:/usr/sbin:${PATH}"
+export PATH
+

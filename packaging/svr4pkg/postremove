@@ -1,0 +1,16 @@
+#! /bin/sh
+
+# Postremove script for COSas package
+# $Id: postremove,v 1.1 2005/11/28 07:18:14 jim Exp $
+
+PATH="/usr/bin:/usr/sbin:${PATH}"
+export PATH
+
+if [ x"${BASEDIR}" != x -a x"${BASEDIR}" != x/ -a "`find ${BASEDIR}`"x = "${BASEDIR}"x ]; then
+	case "${BASEDIR}" in
+	/|/opt|/usr) ;;
+	*) echo "===== Removing empty base dir ${BASEDIR}"
+		rm -rf "${BASEDIR}" ;;
+	esac
+fi
+
