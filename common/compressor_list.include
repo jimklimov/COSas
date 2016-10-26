@@ -1,0 +1,62 @@
+# $Id: compressor_list.include,v 1.7 2010/11/13 22:09:25 jim Exp $
+# (C) Dec 2008-Dec 2008 by Jim Klimov, COS&HT
+
+# A dumper script needs a compressor which can compress pipes (stdin to stdout).
+# Help it pick one; you can override these predefined values in config files.
+
+# This include file lists supported compression utilities.
+# It should be sourced before the config files.
+
+# Note: in general gzip options are predefined for faster compression,
+# while bzip2 options are set for better since it's heavier anyway.
+
+# Add some rather non-standard library paths; i.e. SUNWgccruntime
+# may be required for pbzip2 64-bit variant
+for D in /usr/sfw/lib /opt/sfw/lib /usr/local/lib; do
+    if [ -d "$D" ]; then
+	LD_LIBRARY_PATH="$D:$LD_LIBRARY_PATH"
+	for P in 64 32 sparcv9 amd64 sparcv7 i86 i386; do
+	    [ -d "$D/$P" ] && LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$D/$P"
+	done
+    fi
+done
+export LD_LIBRARY_PATH
+
+# These words are not so much filenames but tags for a CASE below
+[ x"$COMPRESSOR_PREFERENCE" = x ] && \
+	COMPRESSOR_PREFERENCE="pbzip2 bzip2 pigz gzip cat"
+
+# Unrecommended: the 3 values below can be defined in config file
+# and the preference can be emptied (i.e. to test another compressor)
+COMPRESSOR_BINARY=""
+COMPRESSOR_SUFFIX=""
+COMPRESSOR_OPTIONS=""
+
+# Define this pseudo-compressor as a fallback
+COMPRESSOR_CAT=""
+[ -x /bin/cat ] && COMPRESSOR_CAT="/bin/cat"
+
+# We require a GNU zip clone
+COMPRESSOR_PIGZ_LIST="/opt/COSac/bin/pigz /usr/local/bin/pigz /bin/pigz /usr/bin/pigz"
+COMPRESSOR_PIGZ=""
+COMPRESSOR_PIGZ_OPTIONS="-3 --independent -c"
+COMPRESSOR_PIGZ_SUFFIX=".gz"
+
+COMPRESSOR_GZIP_LIST="/opt/COSac/bin/gzip /opt/sfw/bin/gzip /usr/sfw/bin/gzip /usr/local/bin/gzip /bin/gzip /usr/bin/gzip"
+COMPRESSOR_GZIP=""
+COMPRESSOR_GZIP_OPTIONS="-3 -c"
+COMPRESSOR_GZIP_SUFFIX=".gz"
+
+# We require bzip2 (or pbzip2-1.0.3 and newer for stdin-stdout compression)
+COMPRESSOR_PBZIP2_LIST="/opt/COSac/bin/64/pbzip2 /opt/COSac/bin/pbzip2 /opt/COSac/bin/32/pbzip2 /usr/local/bin/pbzip2 /bin/pbzip2 /usr/bin/pbzip2"
+COMPRESSOR_PBZIP2=""
+COMPRESSOR_PBZIP2_OPTIONS="-9 -b9 -c"
+COMPRESSOR_PBZIP2_SUFFIX=".bz2"
+
+COMPRESSOR_BZIP2_LIST="/opt/COSac/bin/bzip2 /opt/sfw/bin/bzip2 /usr/sfw/bin/bzip2 /usr/local/bin/bzip2 /bin/bzip2 /usr/bin/bzip2"
+COMPRESSOR_BZIP2=""
+COMPRESSOR_BZIP2_SUFFIX=".bz2"
+COMPRESSOR_BZIP2_OPTIONS="-9 -c"
+
+### EOF: compressor_list.include
+

@@ -1,0 +1,115 @@
+# $Id: compressor_choice.include,v 1.3 2008/12/02 23:13:13 jim Exp $
+# (C) Dec 2008-Dec 2008 by Jim Klimov, COS&HT
+
+# A dumper script needs a compressor which can compress pipes (stdin to stdout).
+# Help it pick one; you can override these predefined values in config files.
+
+# This include file picks by configured preference from a list of supported
+# compression utilities. It should be sourced while checking pre-requisites.
+
+# Checks that the binary has required .so libraries by trying to run it
+# link errors return as 127, 137, etc.
+# Older bzip2 builds (sol8) exit 1 on help
+
+[ x"$COMPRESSOR_GZIP" = x ] && for F in $COMPRESSOR_GZIP_LIST; do
+	if [ -x "$F" ]; then
+	    "$F" -V --help >/dev/null 2>&1
+	    if [ $? -le 1 ]; then
+		COMPRESSOR_GZIP="$F"
+		break
+	    fi
+	fi
+done
+
+[ x"$COMPRESSOR_PIGZ" = x ] && for F in $COMPRESSOR_PIGZ_LIST; do
+	if [ -x "$F" ]; then
+	    "$F" -V --help >/dev/null 2>&1
+	    if [ $? -le 1 ]; then
+		COMPRESSOR_PIGZ="$F"
+		break
+	    fi
+	fi
+done
+
+[ x"$COMPRESSOR_BZIP2" = x ] && for F in $COMPRESSOR_BZIP2_LIST; do
+	if [ -x "$F" ]; then
+	    "$F" -V --help >/dev/null 2>&1
+	    if [ $? -le 1 ]; then
+		COMPRESSOR_BZIP2="$F"
+		break
+	    fi
+	fi
+done
+
+[ x"$COMPRESSOR_PBZIP2" = x ] && for F in $COMPRESSOR_PBZIP2_LIST; do
+	if [ -x "$F" ]; then
+	    "$F" -V --help >/dev/null 2>&1
+	    if [ $? -le 1 ]; then
+		if [ x"`"$F" -V 2>&1 | egrep 'v1\.0(\.[12])'`" = x ]; then
+			COMPRESSOR_PBZIP2="$F"
+			break
+		fi
+	    fi
+	fi
+done
+
+# Stop processing on the first available and preferred compressor
+for F in $COMPRESSOR_PREFERENCE; do
+	case "$F" in
+		bzip2)
+			if [ -x "$COMPRESSOR_BZIP2" ]; then
+				COMPRESSOR_BINARY="$COMPRESSOR_BZIP2"
+				COMPRESSOR_SUFFIX="$COMPRESSOR_BZIP2_SUFFIX"
+				COMPRESSOR_OPTIONS="$COMPRESSOR_BZIP2_OPTIONS"
+				break
+			fi
+			;;
+		gzip)
+			if [ -x "$COMPRESSOR_GZIP" ]; then
+				COMPRESSOR_BINARY="$COMPRESSOR_GZIP"
+				COMPRESSOR_SUFFIX="$COMPRESSOR_GZIP_SUFFIX"
+				COMPRESSOR_OPTIONS="$COMPRESSOR_GZIP_OPTIONS"
+				break
+			fi
+			;;
+		pbzip2)
+			if [ -x "$COMPRESSOR_PBZIP2" ]; then
+				COMPRESSOR_BINARY="$COMPRESSOR_PBZIP2"
+				COMPRESSOR_SUFFIX="$COMPRESSOR_PBZIP2_SUFFIX"
+				COMPRESSOR_OPTIONS="$COMPRESSOR_PBZIP2_OPTIONS"
+				break
+			fi
+			;;
+		pigz)
+			if [ -x "$COMPRESSOR_PIGZ" ]; then
+				COMPRESSOR_BINARY="$COMPRESSOR_PIGZ"
+				COMPRESSOR_SUFFIX="$COMPRESSOR_PIGZ_SUFFIX"
+				COMPRESSOR_OPTIONS="$COMPRESSOR_PIGZ_OPTIONS"
+				break
+			fi
+			;;
+		cat)
+			if [ -x "$COMPRESSOR_CAT" ]; then
+				COMPRESSOR_BINARY="$COMPRESSOR_CAT"
+				COMPRESSOR_SUFFIX=""
+				COMPRESSOR_OPTIONS=""
+				break
+			fi
+			;;
+		*) echo "WARNING: Undefined compressor preference: $F" >&2
+			;;
+	esac
+done
+
+if [ x"$COMPRESSOR_BINARY" = x -o ! -x "$COMPRESSOR_BINARY" ]; then
+	echo "Requires a compressor such as gzip or bzip2 (configured preference: '$COMPRESSOR_PREFERENCE')" >&2
+	exit 1
+fi
+
+if [ "$VERBOSE" != no ]; then
+	echo "= Will try to compress archives from stdin with command-line like:"
+	echo "= '... | $COMPRESSOR_BINARY $COMPRESSOR_OPTIONS > filename$COMPRESSOR_SUFFIX'"
+fi
+
+# EOF: compressor_choice.include
+

@@ -1,0 +1,66 @@
+### Some utlities running from cron should choose to
+### abort if the system is shutting down (i.e. check
+### and restart some service). These routines should
+### help...
+
+### Variable can be used by includers to work around potential
+### problems during include. Just call the routine like
+### $RUN_CHECKLEVEL myprog param1 param2 ...
+### Can also be used to check that the include succeeded.
+RUN_CHECKLEVEL="run_checklevel"
+
+### $Id: runlevel_check.include,v 1.5 2013/02/28 01:52:58 jim Exp $
+### (C) 2005-2010 by Jim Klimov, JSC COS&HT
+
+### Mask of "shutting down" run-levels for several OSes
+### Can override via config file/environment
+[ x"$RUNLEVEL_NOKICK" = x ] && RUNLEVEL_NOKICK="Linux  06
+SunOS   056"
+
+### Routine to check whether the system is shutting down
+### Returns 0 or 1
+### Echoes an empty string if ok to run,
+###       not empty if shutting down
+check_runlevel() {
+    OS=`uname -s`
+    case "$OS" in
+        FreeBSD) # No runlevels, running is working
+            return 0 ;;
+    esac
+    RUNLEVEL=`/usr/bin/who -r | sed 's/^\(.*\)run-level \([^ ]\)\(.*\)$/\2/'`
+
+    # Check if current runlevel is OK to run:
+    # If OS is not in list, always OK
+    # If OS is in list, and RUNLEVEL is not in list, OK to run
+    RLMASK=`echo "$RUNLEVEL_NOKICK" | egrep '^'"$OS " | head -1 | awk '{ print $2 }' | grep "$RUNLEVEL"`
+    echo "$RLMASK"
+
+    [ x"$RLMASK" = x ]
+    return $?
+}
+
+### Check the runlevel and abort if shutting down.
+### Expected to be the most used function ;)
+block_runlevel() {
+    if [ x"`check_runlevel`" != "x" ]; then
+	echo "INFO: System '`hostname`.`domainname`' is shutting down.
+INFO: Aborting agent $AGENTNAME ($AGENTDESC)..." >&2
+	exit 0
+    fi
+    return 0
+}
+
+### Runs its specified parameters ($@) if the
+### system is not shutting down
+run_checklevel() {
+    # Kick-Start service if not in given runlevels for given OS (i.e. restart)
+    RLMASK="`check_runlevel`"
+    if [ x"$RLMASK" = x ]; then
+        "$@"
+        return $?
+    else
+        echo "INFO: Not running '$@' for agent '$AGENTNAME' ($AGENTDESC) up because '$OS' is in runlevel '$RUNLEVEL'" >&2
+        return 0
+    fi
+}
+
