@@ -1,0 +1,9 @@
+= TODO for the COSas (COS&HT admin scripts) repo
+
+* As the code came from a sanitized origins of an internal project, make sure it still works after the clean-up ;)
+* Review packaging procedures for SVR4 and RPM to automate respins of packages; automate as much as possible by a Makefile.
+* Publish the downloadable PKG and RPM packages at e.g. a special branch of this project.
+* Explore systemd integration for Linux.
+* Whitespace / indentation unification.
+* Port documentations about purposes, options/setup and other nuances of the scripts.
+* Some scripts may be too dependent on locations where they expect a GNU `tar` to be and/or its filename (`gtar` or `tar`) - fix those as issues are encountered on other distros than those we used.
