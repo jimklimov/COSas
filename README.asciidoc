@@ -1,2 +1,75 @@
-# COSas
-COS&amp;HT admin scripts that automate the life and backups of our deployments for the past couple of decades.
+= COSas
+
+Here are COS&HT admin scripts that automate the life and backups of our
+deployments for the past couple of decades. They are portable enough for
+Solaris 7-11 and illumos, Linux and BSD.
+
+Select few are even ported to MS Windows batch-file scripting just to provide
+similar functionality that we needed in our portable deployments.
+
+Modern users might have use for the `agent-*` scripts to probe stuff using
+just the `telnet` client as a means to access TCP/IP services, and the agents
+to inpect filesystem sizes and availability (think networked FS which may
+be inaccessible sometimes - programs should block on this forever, especially
+not if `cron` spawns them regularly); the `timerun.sh` to limit the time
+a spawned process can run; `proctree.sh` to send signals to a process and
+its children; the `test-archive.sh` to validate downloads and other long-term
+archives; and scripts which revolve around backups - especially `clean-dump.sh`
+and `clean-zfs-snaps.sh` which help to maintain the specified baseline of
+available disk space on the backup storage host, and `dumper-generic.sh` as
+a way to archive specified locations into a tarball with a standardized
+filename (including hostname and timestamp of the backup); and the `*.include`
+files with useful routines, such as detection of available archivation and
+compression utilities and appropriate setup for backup scripts to compress
+their dumps with whatever is available.
+
+== Disclaimers
+
+Be wary of hardcodings and assumptions that may be present somewhere, at
+least until this code is digested and made more generally applicable.
+
+If some edges seem too rough... oh well, there was a time when we learned
+the shell-scripting best practices, the hard way ;)
+
+If some programs evoke questions "why did you invent a wheel and not use
+program XXX to achieve this goal?", the common counter-answer would be
+"was program XXX around 20 years ago? did it work on all OSes we need?"
+Still, the original question would be valid, so the politically correct
+one would be "we got used to these tools we know and use everywhere for
+years without a hitch and serious downsides... so if it ain't broke --
+don't fix" ;)
+
+== Repo layout
+
+The repository is split into subdirectories (original project had all scripts
+in the `bin/` subdirectory, so packaging recipes may need to get adapted):
+
+* `bat/` -- the MS Windows batch files for a few needed automations;
+* `common/` -- the bulk of system interrogation and automation scripts used as
+   a baseline in our deployments lifecycle and/or called from other projects;
+* `sjs/` -- scripts that automated specifically some jobs for Sun Java System
+  (enterprise software stack) deployments, like backups of Sun/Oracle DSEE LDAP
+  servers, probing Access Manager/OpenSSO login service functionality, etc.
+  They rely on some `common` scripts, just are not of interest to everyone.
+
+Metadata directories include:
+
+* `packaging/svr4pkg/` and `packaging/rpm/` for respective packaging recipes;
+* `services/smf-manifests/` for installation of a regularly running script as
+  a service under the system service framework (currently only for Solaris SMF).
+
+== Historical note
+
+NOTE: This project's opensourced (Github) life starts without a copy of tracked
+pre-history, as its initial code drop is merged and sanitized from internal and
+end-user projects.
+
+First in-house packages were built in 2005 for delivery to customers, though
+some scripts may have started their life even before that, and evolved for some
+opensource deployments later on. So code up to this point is:
+----
+Copyright (C) 2004-2014 Jim Klimov, JSC COS&HT
+Copyright (C) 2004-2016 Jim Klimov
+----
+with helpful input from colleagues in JSC COS&HT which helped shape the next
+steps of development.
