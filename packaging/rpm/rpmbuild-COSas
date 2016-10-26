@@ -1,0 +1,29 @@
+#!/bin/sh
+
+# $Id: rpmbuild-COSas,v 1.6 2010/12/02 01:12:04 jim Exp $
+# Simple invokation to help build and test COSas under linux with RPM
+# Builds first listed package from the spec file
+
+[ x"$__RPMBUILD_BASEDIR" = x ] && __RPMBUILD_BASEDIR="/home/jim/rpm"
+[ x"$__RELEASE_DIR" = x ] && __RELEASE_DIR="/home/jim/pkg/_RPMS"
+
+cd "${__RPMBUILD_BASEDIR}/SPECS" || exit 1
+
+[ x"$__SPECFILE" = x ] && __SPECFILE="COSas.spec"
+[ x"$__ARCHLIST" = x ] && __ARCHLIST="noarch"
+
+[ -s "$__SPECFILE" ] || { echo "FATAL: RPM specfile '`pwd`/$__SPECFILE' not found!" >&2; exit 1; }
+
+__RPM_PACKAGE_NAME="$(cat "$__SPECFILE" | egrep '^Name: ' | head -1 | ( IFS=" " read _TAG _VAL; echo "$_VAL" ))"
+__RPM_PACKAGE_VERSION="$(cat "$__SPECFILE" | egrep '^Version: ' | head -1 | ( IFS=" " read _TAG _VAL; echo "$_VAL" ))"
+__RPM_PACKAGE_RELEASE="$(cat "$__SPECFILE" | egrep '^Release: ' | head -1 | ( IFS=" " read _TAG _VAL; echo "$_VAL" ))"
+
+for ARCH in $__ARCHLIST; do
+	echo "=== Building RPM package $__RPM_PACKAGE_NAME-$__RPM_PACKAGE_VERSION-$__RPM_PACKAGE_RELEASE.$ARCH.rpm..."
+	rpmbuild --target noarch -ba "$__SPECFILE" && ( \
+		echo "===== Copying to /tmp..."
+		cp -f "${__RPMBUILD_BASEDIR}/RPMS/$ARCH/$__RPM_PACKAGE_NAME-$__RPM_PACKAGE_VERSION-$__RPM_PACKAGE_RELEASE.$ARCH.rpm" /tmp
+		echo "===== Copying to $__RELEASE_DIR..."
+		cp -f "${__RPMBUILD_BASEDIR}/RPMS/$ARCH/$__RPM_PACKAGE_NAME-$__RPM_PACKAGE_VERSION-$__RPM_PACKAGE_RELEASE.$ARCH.rpm" "$__RELEASE_DIR"
+	)
+done
