@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# $Id: clean-zfs-snaps.sh,v 1.9 2015/05/15 08:09:02 jim Exp $
-# (C) 2013-2015 by Jim Klimov
+# $Id: clean-zfs-snaps.sh,v 1.10 2017/08/29 04:39:24 jim Exp $
+# (C) 2013-2017 by Jim Klimov
 # This script should find and clean up same-named snapshots conforming to
 # a pattern specified by the user, starting from the oldest (by "creation"
 # attribute), until some specified amount of free space is made on the pool.
@@ -14,6 +14,9 @@
 # * Let call certain routines via command-line (but group them by default)
 # * See now if parsing the timestamps (or sizes) is at all needed?
 #   Or make up some usecase for that?
+
+# Note: do not dump this into tmpfs, we can have A LOT of data spilled here
+[ -n "$TMPDIR" ] && [ -d "$TMPDIR" ] && [ x"$TMPDIR" != x/tmp ] || TMPDIR=/var/tmp
 
 # RegExp that matches a string for timestamps, usable by sed/egrep/(awk?)
 TSRE='([0-9]{8}(T|t|Z|z|:|-)*[0-9]{6}(Z|z)?|([0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{8})(Z|z|-)[0-9]{2}(:|h|-)*[0-9]{2})'
@@ -69,15 +72,15 @@ AGENTDESC="Clean up automatically made snapshots"
 
 TIMEOUT=15
 
-COSAS_BINDIR=`dirname "$0"`
+COSAS_BINDIR="`dirname "$0"`"
 if [ x"$COSAS_BINDIR" = x./ -o x"$COSAS_BINDIR" = x. ]; then
-	COSAS_BINDIR=`pwd`
+	COSAS_BINDIR="`pwd`"
 fi
 TIMERUN="$COSAS_BINDIR/timerun.sh"
 
 # Params for lockfile
 BUGMAIL="postmaster"
-HOSTNAME=`hostname`
+HOSTNAME="`hostname`"
 
 LOCK_BASE="/tmp/$AGENTNAME.lock"
 # Set WAIT_C=0 to skip waits
@@ -511,19 +514,19 @@ reduceRAW() {
 	log_debug 3 "=== $X_DS@$X_SN" >&2
 	[ -n "$X_DS" -a -n "$X_SN" ] && echo "	$X_DS@$X_SN\$" || \
 	    log_debug 3 "===== $X_DS@$X_SN: ignored" >&2
-    done > /tmp/.snapraw.$$.tmp
+    done > "${TMPDIR}"/.snapraw.$$.tmp
     RES=$?
 
     log_info 2 "reduceRAW(): `date`: Prepared" \
-	"`wc -l /tmp/.snapraw.$$.tmp | awk '{print $1}'`" \
+	"`wc -l "${TMPDIR}"/.snapraw.$$.tmp | awk '{print $1}'`" \
 	"patterns for exclusion; RES=$RES" >&2
 
     if [ $RES = 0 ]; then
-	echo "$ALLSNAPS_RAW" | ggrep -E -v -f /tmp/.snapraw.$$.tmp
+	echo "$ALLSNAPS_RAW" | ggrep -E -v -f "${TMPDIR}"/.snapraw.$$.tmp
 	RES=$?
 	if [ $RES != 0 ]; then
 	    N1="`echo "$ALLSNAPS_RAW" | egrep -v '^$' | wc -l | sed 's, ,,g'`"
-	    N2="`cat /tmp/.snapraw.$$.tmp | wc -l | sed 's, ,,g'`"
+	    N2="`cat "${TMPDIR}"/.snapraw.$$.tmp | wc -l | sed 's, ,,g'`"
 	    [ "$N1" = "$N2" ] && RES=0	# Assume a clean cut-off
 	fi
 	log_info 2 "reduceRAW(): finished removals; RES=$RES" >&2
@@ -533,8 +536,8 @@ reduceRAW() {
 	log_warn 0 "reduceRAW(): something failed; RES=$RES" >&2
     fi
 
-#    echo "$ALLSNAPS_RAW" > /tmp/.snapraw.$$.raw
-    rm -f /tmp/.snapraw.$$.tmp
+#    echo "$ALLSNAPS_RAW" > "${TMPDIR}"/.snapraw.$$.raw
+    rm -f "${TMPDIR}"/.snapraw.$$.tmp
 
     return $RES
 }
