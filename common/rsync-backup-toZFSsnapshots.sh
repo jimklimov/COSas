@@ -5,7 +5,7 @@
 # and add the contents of source:/root/.ssh/id_rsa.pub
 # to backup:/root/.ssh/authorized_keys)
 # $Id: rsync-backup-toZFSsnapshots.sh,v 1.10 2015/04/02 17:57:57 jim Exp $
-# (C) 2014 by Jim Klimov
+# (C) 2014-2018 by Jim Klimov
 # Crontab usage examples:
 ### Quick rsync of Jenkins dirs for example:
 # 30 * * * * [ -x /opt/COSas/bin/rsync-backup-toZFSsnapshots.sh ] && SRCDIRS="/{usr,var}/lib/jenkins* /etc" /opt/COSas/bin/rsync-backup-toZFSsnapshots.sh >/dev/null
@@ -102,7 +102,9 @@ done 2>&1
 TS="`date -u +%Y%m%dZ%H%M%S`" || \
 	CODE=9 die "Can't generate timestamp"
 SS="rsync-afterBackup-$TS"
-[ "$RES_RSYNC" = 0 ] && \
+# Code 24 = source files vanished during backup
+# See https://bugzilla.samba.org/show_bug.cgi?id=3653#c15
+[ "$RES_RSYNC" = 0 -o "$RES_RSYNC" = 24 ] && \
 	SS="$SS-completed" || \
 	SS="$SS-failed-$RES_RSYNC"
 
